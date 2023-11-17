@@ -1,0 +1,187 @@
+
+
+ // Step 17 created this new exPense file for user when thet create a new exPense
+
+
+import 'package:flutter/material.dart' ;
+import 'package:intl/intl.dart';
+// import 'package:new_expenses/modals/expense.dart' ;
+
+
+final formatter = DateFormat.yMd();                  // 33 copied from step 12 for using it below
+
+class NewExpense extends StatefulWidget{
+  const NewExpense({super.key});
+  @override
+  State<NewExpense> createState() {
+     return _NewExpenseState();
+  }
+}
+
+
+class _NewExpenseState extends State<NewExpense>{
+  // var _enteredTitle = '';                        // step 20
+  //  void _saveUserTitle(String userInput){
+  //    _enteredTitle = userInput;
+
+
+  // another method of above that optimize Performance and handle user input
+   
+    final _titleController  = TextEditingController();        // step 21 // this is inbuilt class (when user modifiy text then textfield update and controller notify listener )
+    final _amountController = TextEditingController();
+     DateTime ? _selectedDate;                                // 31 datetime is inbuilt datatype here
+    //Category _selectedCategory = Category.leisure;           // 34 initallly it set to leisure(default)
+
+    void _presentDatePicker() async {                         // step 27 for date Picker on calendar  // 29 Passed asyn between Parenthesis and curly braces 
+
+      final now = DateTime.now();                         
+      final firstdate = DateTime(now.year -1 ,now.month,now.day);  // -1 means here it will show date of current and Previous year
+        //  showDatePicker(
+         final pickedDate = await showDatePicker(                     // 30 store function inside PickDate with await func i.e inbuilt 
+        context: context,
+         initialDate: now,
+          firstDate: firstdate,
+           lastDate: now,
+      );
+       setState(() {
+      _selectedDate = pickedDate;                                // 32 
+       });
+    }
+
+     void _submitExpenseData(){                                  // 36 for submitting our new expense
+        // final enteredAmount = double.tryParse(_amountController.text);  // tryparse('1.2)=> 1.2 & tryparse('helo')=>null
+        // final amountIsInvalid = enteredAmount == null || enteredAmount <= 0 ;  // for invalid amount entered
+ 
+//     if (_titleController.text.trim().isEmpty || amountIsInvalid || _selectedDate == null) {
+//   showDialog(
+//     context: context,
+//     builder: (ctx) => AlertDialog(
+//       title: const Text('Invalid Input'),
+//       content: const Text('Make sure that valid title, date & category were selected!'),
+//       actions: [
+//         TextButton(
+//           onPressed: () {
+//             Navigator.pop(ctx);
+//           },
+//           child: const Text('Okay'),
+//         ),
+//       ],
+//     ),
+//   );
+// } else {
+//   // Continue with your code if conditions are met
+//   // ...
+//   return ;
+// }
+     }
+
+     
+
+    @override
+  void dispose() {
+    _titleController.dispose();                              // 22  when expense no longer needed so that it can be dispose/discard
+    _amountController.dispose();
+    super.dispose();
+  }
+  @override
+  Widget build(BuildContext context) {
+    return  Padding(
+        padding: const EdgeInsets.all(7),
+            child: Column(
+              children:  [
+                // Expanded(                                      // ye exPand ki wajah se mera title aur amount k beech me bhot sPace aa ra tha 
+                 TextField(
+                    //onChanged:_saveUserTitle ,                   // step 19 // 21 Passed here
+                    controller: _titleController,                  // 23
+                    maxLength: 50,
+                    decoration: const InputDecoration(
+                      label: Text('title'),
+                      // prefixText: 'Enter your expense name !',
+                      // helperText: 'enter your tit',
+                      // hintText: AutofillHints.,
+                    ),
+                 ),
+                // ), 
+                // Expanded(
+                Row(                                                                  // Step 26 take amount under row                                                                   
+                   children: [ 
+                  TextField(              
+                      controller: _amountController,                  // 23
+                      keyboardType: TextInputType.number,
+                      decoration: const InputDecoration(
+                        prefixText: '\$ ',
+                        label: Text('Enter Amount'),
+                      ),
+                    ),
+                  
+                  const SizedBox(width: 20,),
+                 Row(                 
+                      mainAxisAlignment: MainAxisAlignment.end,                             // 26 take new row inside row so that amount & date comes under same line
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        // const Text('Select Date'),
+                         Text( _selectedDate == null ? 'No date Selected' : formatter.format(_selectedDate!)),   // 34 here used ternary exp and at last used ! -> so that it tell dart that  this value wont be null 
+                        IconButton(onPressed: _presentDatePicker,              // step 28  function Passed here
+                         icon:const  Icon(Icons.calendar_month))
+                      ],
+                    ),
+                  
+                   ],
+                  ),
+                // ),
+                 const   SizedBox(height: 10,),
+               Row(                                              // row
+                      children: [
+                          // DropdownButton(
+                          //     value : _selectedCategory;          // 36 it will shoe when cat was selected
+                          //     items:  cat.Category.values
+                          //     .map(
+                          //       (category)=>DropdownMenuItem(
+                          //         child: Text(
+                          //          // category.name.toString(),
+                          //           category.name.toUpperCase,
+                          //     ),
+                          //     ),
+                          //    ).toList(),
+                          //     onChanged: (value){
+                          //      // print(value);
+                          //      if(value == null){         // 35  below code execute when value is not null
+                          //       return;
+                          //      }
+                          //      setState((){
+                          //        _selectedCategory = value 
+                          //       })
+                          //     }),
+                         
+                         
+                         const Spacer(),
+                           TextButton(onPressed: (){
+                            Navigator.pop(context);                      // 25 it will delete input(build method me context tha isliye yaha Pass kiye (q ki usme hi Pura sab hai ))
+                          },
+                           child:const Text('Cancel'),
+                           ),
+                       
+                         const SizedBox(width: 10,),
+                        ElevatedButton(onPressed: (){
+                          //  print(_enteredTitle);
+                            // print(_titleController.text);               // 24 using this we dont need to manually store input
+                            // print(_amountController.text);  
+                            _submitExpenseData();                          // 37             
+                        }, 
+                        child: const Text('save expense'),),
+                      ],
+                    ),
+                
+                
+              ],
+        ),
+      );
+
+  }
+  }
+
+
+                          // Error !!!!!!!!!!!!!!
+ //Exception has occurred.(this is my error came i.e main isloate is Paused in debugger (below are the error detail ) Solution is I WraPPed every textfield with ExPanded ad suddenly it solve)
+   // _AssertionError ('package:flutter/src/material/input_decorator.dart': Failed assertion: line 945 pos 7: 'layoutConstraints.maxWidth < double.infinity': An InputDecorator, which is typically created by a TextField, cannot have an unbounded width.
+  // This happens when the parent widget does not provide a finite width constraint. For example, if the InputDecorator is contained by a Row, then its width must be constrained. An Expanded widget or a SizedBox can be used to constrain the width of the InputDecorator or the TextField that contains it.)
